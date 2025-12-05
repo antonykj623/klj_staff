@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kljcafe_employee/blocs/dashboard/dashboard_bloc.dart';
 import 'package:kljcafe_employee/blocs/expense/expense_bloc.dart';
 import 'package:kljcafe_employee/blocs/income/income_bloc.dart';
 import 'package:kljcafe_employee/blocs/login/login_bloc.dart';
@@ -19,6 +20,10 @@ void main() {
 
         BlocProvider<IncomeBloc>(
           create: (_) => IncomeBloc(),
+        ),
+
+        BlocProvider<DashboardBloc>(
+          create: (_) => DashboardBloc(),
         ),
 
         BlocProvider<ExpenseBloc>(

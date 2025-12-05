@@ -8,6 +8,7 @@ class APICredentials{
   static String login="login.php";
   static String incomereport="getIncomeReport.php";
   static String expensereport="getExpenseReport.php";
+  static String getAllTransactions="getAllTransactions.php";
 
 
 

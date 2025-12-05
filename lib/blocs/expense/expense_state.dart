@@ -8,9 +8,9 @@ final class ExpenseInitial extends ExpenseState {}
 
 final class ExpenseReportSuccess extends ExpenseState {
 
-  ExpenseDataEntity loginResponseEntity;
+  ExpenseDataEntity expenseDataEntity;
 
-  ExpenseReportSuccess(this.loginResponseEntity);
+  ExpenseReportSuccess(this.expenseDataEntity);
 
 }
 

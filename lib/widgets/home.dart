@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kljcafe_employee/blocs/dashboard/dashboard_bloc.dart';
 import 'package:kljcafe_employee/blocs/expense/expense_bloc.dart';
 import 'package:kljcafe_employee/blocs/income/income_bloc.dart';
+import 'package:kljcafe_employee/domain/dashboard_entity.dart';
 import 'package:kljcafe_employee/domain/expense_data_entity.dart';
 import 'package:kljcafe_employee/domain/income_data_entity.dart';
 
@@ -30,13 +32,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getIncomeReport();
-    getExpenseReport();
-  }
 
-  getExpenseReport()async{
-    BlocProvider.of<ExpenseBloc>(context).add(
-      FetchAllExpense(
+    BlocProvider.of<DashboardBloc>(context).add(
+      LoadDashboard(
           formatDate(startDate),
           formatDate(endDate)
       ),
@@ -44,15 +42,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
   }
 
-  getIncomeReport()async{
-    BlocProvider.of<IncomeBloc>(context).add(
-      FetchAllIncome(
-        formatDate(startDate),
-    formatDate(endDate)
-      ),
-    );
-
-  }
+  // getExpenseReport()async{
+  //   BlocProvider.of<ExpenseBloc>(context).add(
+  //     FetchAllExpense(
+  //         formatDate(startDate),
+  //         formatDate(endDate)
+  //     ),
+  //   );
+  //
+  // }
+  //
+  // getIncomeReport()async{
+  //   BlocProvider.of<IncomeBloc>(context).add(
+  //     FetchAllIncome(
+  //       formatDate(startDate),
+  //   formatDate(endDate)
+  //     ),
+  //   );
+  //
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -109,8 +117,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 onPressed: () {
 
-                  getIncomeReport();
-                  getExpenseReport();
+                  BlocProvider.of<DashboardBloc>(context).add(
+                    LoadDashboard(
+                        formatDate(startDate),
+                        formatDate(endDate)
+                    ),
+                  );
 
                 },
                 child:  const Text(
@@ -128,121 +140,70 @@ class _HomeScreenState extends State<HomeScreen> {
             // -------------------------
             // DASHBOARD CARDS
             // -------------------------
-            Row(
-              children: [
-                Expanded(child: BlocConsumer<IncomeBloc, IncomeState>(
-    listener: (context, state) {
-    if (state is IncomeReportSuccess) {
 
-   // AppUtils.hideLoader(context);
+            BlocConsumer<DashboardBloc, DashboardState>(
+            listener: (context, state) {
 
+              if (state is DashboardSuccess) {
 
-    IncomeDataEntity loginresponse=state.loginResponseEntity;
+                if(state.dashboardEntity.status==1)
+                  {
+                    DashboardEntity dbe=state.dashboardEntity;
 
-    if(loginresponse.status==1)
-    {
-      List<IncomeDataData> data =loginresponse.data!;
-      income=0;
-
-      setState(() {
-        for(IncomeDataData d in data)
-        {
-          double amount=double.parse(d.amount.toString());
-          income=income+amount;
-        }
-      });
+                    setState(() {
+                      income=dbe.totalIncome!.toDouble();
+                      expense=dbe.totalExpense!.toDouble();
 
 
-
-    }
-
+                    });
 
 
-    }
-    else if(state is IncomeReportLoading)
-    {
+                  }
 
-   // AppUtils.showLoader(context);
-    }
+              }
+              else if(state is DashboardFailed)
+              {
 
+              }
+              else if(state is DashboardLoading)
+              {
 
-
-
-    else if (state is IncomeReportFailed) {
-      //AppUtils.showLoader(context);
-    }
-    },
+              }
+            },
     builder: (context, state) {
-    return
+    return  Row(
+      children: [
+        Expanded(child:     dashboardCard(
+          title: "Income",
+          amount: income,
+          color: Colors.green,
+          icon: Icons.arrow_upward,
+        )
 
-    dashboardCard(
-    title: "Income",
-    amount: income,
-    color: Colors.green,
-    icon: Icons.arrow_upward,
+
+
+
+
+        ),
+        const SizedBox(width: 5),
+
+
+        Expanded(child:  dashboardCard(
+          title: "Expense",
+          amount: expense,
+          color: Colors.red,
+          icon: Icons.arrow_downward,
+        )
+
+
+        ),
+      ],
     );
-    })
-
-                ),
-                const SizedBox(width: 5),
-
-
-                Expanded(child:
-    BlocConsumer<ExpenseBloc, ExpenseState>(
-    listener: (context, state) {
-    if (state is ExpenseReportSuccess) {
-
-    // AppUtils.hideLoader(context);
-
-
-    ExpenseDataEntity loginresponse=state.loginResponseEntity;
-
-    if(loginresponse.status==1)
-    {
-    List<ExpenseDataData> data =loginresponse.data!;
-
-
-    setState(() {
-      expense=0;
-    for(ExpenseDataData d in data)
-    {
-    double amount=double.parse(d.amount.toString());
-    expense=expense+amount;
-    }
-    });
-
-
-
-    }
-
-
-
-    }
-
-
-
-
-
-    else if (state is ExpenseReportFailed) {
-    //AppUtils.showLoader(context);
-    }
     },
-    builder: (context, state) {
-    return
+    )
 
 
-    dashboardCard(
-    title: "Expense",
-    amount: expense,
-    color: Colors.red,
-    icon: Icons.arrow_downward,
-    );
-    })
-
-
-    ),
-              ],
-            ),
+,
 
             const SizedBox(height: 5),
 

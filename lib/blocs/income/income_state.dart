@@ -7,9 +7,9 @@ final class IncomeInitial extends IncomeState {}
 
 final class IncomeReportSuccess extends IncomeState {
 
-  IncomeDataEntity loginResponseEntity;
+  IncomeDataEntity incomeDataEntity;
 
-  IncomeReportSuccess(this.loginResponseEntity);
+  IncomeReportSuccess(this.incomeDataEntity);
 
 }
 
