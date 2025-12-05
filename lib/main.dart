@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:kljcafe_employee/blocs/expense/expense_bloc.dart';
+import 'package:kljcafe_employee/blocs/income/income_bloc.dart';
 import 'package:kljcafe_employee/blocs/login/login_bloc.dart';
+import 'package:kljcafe_employee/prefdata/sharedpref.dart';
+import 'package:kljcafe_employee/web/api_credentials.dart';
+import 'package:kljcafe_employee/widgets/home.dart';
 import 'package:kljcafe_employee/widgets/login.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 void main() {
@@ -10,6 +15,14 @@ void main() {
 
         BlocProvider<LoginBloc>(
           create: (_) => LoginBloc(),
+        ),
+
+        BlocProvider<IncomeBloc>(
+          create: (_) => IncomeBloc(),
+        ),
+
+        BlocProvider<ExpenseBloc>(
+          create: (_) => ExpenseBloc(),
         ),
       ],
       child: MyApp(),
@@ -81,13 +94,50 @@ class _MyHomePageState extends State<MyHomePage> {
   redirectToNextPage()
   {
 Future.delayed(Duration(seconds: 3),() {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => LoginScreen()),
-  );
 
+checkPage();
 
 },);
+  }
+
+
+  checkPage()
+  async {
+
+    await SharedPref().init();
+
+    String? token= SharedPref().getString(APICredentials.apptoken);
+
+
+    if(token!=null)
+      {
+
+        if(token.toString().isNotEmpty)
+          {
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+          }
+        else{
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+          );
+
+        }
+
+
+      }
+    else{
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    }
+
   }
 
 

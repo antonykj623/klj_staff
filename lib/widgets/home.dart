@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kljcafe_employee/blocs/expense/expense_bloc.dart';
+import 'package:kljcafe_employee/blocs/income/income_bloc.dart';
+import 'package:kljcafe_employee/domain/expense_data_entity.dart';
+import 'package:kljcafe_employee/domain/income_data_entity.dart';
+
+import '../utils/apputils.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -6,9 +14,45 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  double income = 12000;
-  double expense = 4500;
-  double wallet = 7500;
+  double income = 0.0;
+  double expense = 0.0;
+  double wallet = 0.0;
+
+  DateTime startDate = DateTime.now();
+  DateTime endDate = DateTime.now();
+
+  String formatDate(DateTime date) {
+    return DateFormat("yyyy-MM-dd").format(date);
+  }
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getIncomeReport();
+    getExpenseReport();
+  }
+
+  getExpenseReport()async{
+    BlocProvider.of<ExpenseBloc>(context).add(
+      FetchAllExpense(
+          formatDate(startDate),
+          formatDate(endDate)
+      ),
+    );
+
+  }
+
+  getIncomeReport()async{
+    BlocProvider.of<IncomeBloc>(context).add(
+      FetchAllIncome(
+        formatDate(startDate),
+    formatDate(endDate)
+      ),
+    );
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,68 +68,275 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(8),
         child: Column(
           children: [
+
+            // -------------------------
+            // START & END DATE PICKERS
+            // -------------------------
             Row(
               children: [
-                Expanded(child: dashboardCard(
-                  title: "Income",
-                  amount: income,
-                  color: Colors.green,
-                  icon: Icons.arrow_upward,
-                )),
-                const SizedBox(width: 12),
-                Expanded(child: dashboardCard(
-                  title: "Expense",
-                  amount: expense,
-                  color: Colors.red,
-                  icon: Icons.arrow_downward,
-                )),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => pickStartDate(),
+                    child: dateCard("Start Date", formatDate(startDate)),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => pickEndDate(),
+                    child: dateCard("End Date", formatDate(endDate)),
+                  ),
+                ),
               ],
-            ),
-
-            const SizedBox(height: 12),
-
-            dashboardCard(
-              title: "Wallet Balance",
-              amount: wallet,
-              color: Colors.blue,
-              icon: Icons.account_balance_wallet,
-              isLarge: true,
             ),
 
             const SizedBox(height: 20),
 
-            const Text(
-              "Recent Transactions",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2575FC),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+
+                  getIncomeReport();
+                  getExpenseReport();
+
+                },
+                child:  const Text(
+                  "Search",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
 
-            ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return transactionTile(
-                  title: "Sample Transaction ${index + 1}",
-                  amount: (index + 1) * 150.50,
-                  isIncome: index % 2 == 0,
-                );
-              },
-            )
+            // -------------------------
+            // DASHBOARD CARDS
+            // -------------------------
+            Row(
+              children: [
+                Expanded(child: BlocConsumer<IncomeBloc, IncomeState>(
+    listener: (context, state) {
+    if (state is IncomeReportSuccess) {
+
+   // AppUtils.hideLoader(context);
+
+
+    IncomeDataEntity loginresponse=state.loginResponseEntity;
+
+    if(loginresponse.status==1)
+    {
+      List<IncomeDataData> data =loginresponse.data!;
+      income=0;
+
+      setState(() {
+        for(IncomeDataData d in data)
+        {
+          double amount=double.parse(d.amount.toString());
+          income=income+amount;
+        }
+      });
+
+
+
+    }
+
+
+
+    }
+    else if(state is IncomeReportLoading)
+    {
+
+   // AppUtils.showLoader(context);
+    }
+
+
+
+
+    else if (state is IncomeReportFailed) {
+      //AppUtils.showLoader(context);
+    }
+    },
+    builder: (context, state) {
+    return
+
+    dashboardCard(
+    title: "Income",
+    amount: income,
+    color: Colors.green,
+    icon: Icons.arrow_upward,
+    );
+    })
+
+                ),
+                const SizedBox(width: 5),
+
+
+                Expanded(child:
+    BlocConsumer<ExpenseBloc, ExpenseState>(
+    listener: (context, state) {
+    if (state is ExpenseReportSuccess) {
+
+    // AppUtils.hideLoader(context);
+
+
+    ExpenseDataEntity loginresponse=state.loginResponseEntity;
+
+    if(loginresponse.status==1)
+    {
+    List<ExpenseDataData> data =loginresponse.data!;
+
+
+    setState(() {
+      expense=0;
+    for(ExpenseDataData d in data)
+    {
+    double amount=double.parse(d.amount.toString());
+    expense=expense+amount;
+    }
+    });
+
+
+
+    }
+
+
+
+    }
+
+
+
+
+
+    else if (state is ExpenseReportFailed) {
+    //AppUtils.showLoader(context);
+    }
+    },
+    builder: (context, state) {
+    return
+
+
+    dashboardCard(
+    title: "Expense",
+    amount: expense,
+    color: Colors.red,
+    icon: Icons.arrow_downward,
+    );
+    })
+
+
+    ),
+              ],
+            ),
+
+            const SizedBox(height: 5),
+
+
+
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
+  // -------------------------
+  // DATE CARD WIDGET
+  // -------------------------
+  Widget dateCard(String title, String dateText) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 8, spreadRadius: 2),
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.date_range, color: Colors.blueAccent),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        color: Colors.black54, fontSize: 12)),
+                const SizedBox(height: 5),
+                Text(
+                  dateText,
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.arrow_drop_down, color: Colors.grey),
+        ],
+      ),
+    );
+  }
+
+  // -------------------------
+  // START DATE PICKER
+  // -------------------------
+  Future<void> pickStartDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: startDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+
+    if (picked != null) {
+      setState(() {
+        startDate = picked;
+
+        // Ensure end date is never before start date
+        if (endDate.isBefore(startDate)) {
+          endDate = startDate;
+        }
+      });
+    }
+  }
+
+  // -------------------------
+  // END DATE PICKER
+  // -------------------------
+  Future<void> pickEndDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: endDate,
+      firstDate: startDate, // can't pick before start date
+      lastDate: DateTime(2035),
+    );
+
+    if (picked != null) {
+      setState(() {
+        endDate = picked;
+      });
+    }
+  }
+
   // ------------------------------
-  // Dashboard Card Widget
+  // Dashboard Card
   // ------------------------------
   Widget dashboardCard({
     required String title,
@@ -96,7 +347,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }) {
     return Container(
       height: isLarge ? 120 : 100,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -111,25 +362,24 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         children: [
           CircleAvatar(
-            radius: 26,
+            radius: 18,
             backgroundColor: color.withOpacity(0.2),
-            child: Icon(icon, color: color, size: 28),
+            child: Icon(icon, color: color, size: 15),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontSize: 16, color: Colors.black54),
-                ),
+                Text(title,
+                    style:
+                    const TextStyle(fontSize: 13, color: Colors.black54)),
                 const SizedBox(height: 5),
                 Text(
                   "₹ ${amount.toStringAsFixed(2)}",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 15,
                     color: color,
                     fontWeight: FontWeight.bold,
                   ),
@@ -137,53 +387,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           )
-        ],
-      ),
-    );
-  }
-
-  // ------------------------------
-  // Transaction Tile Widget
-  // ------------------------------
-  Widget transactionTile({
-    required String title,
-    required double amount,
-    required bool isIncome,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 8,
-          )
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(
-            isIncome ? Icons.arrow_upward : Icons.arrow_downward,
-            color: isIncome ? Colors.green : Colors.red,
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-          Text(
-            "₹ ${amount.toStringAsFixed(2)}",
-            style: TextStyle(
-              fontSize: 16,
-              color: isIncome ? Colors.green : Colors.red,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
         ],
       ),
     );

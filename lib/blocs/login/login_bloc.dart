@@ -16,6 +16,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginButtonPressed>((event, emit) async {
 
       try {
+        emit(LoginLoading(""));
         final response =
             await LoginRepository.loginUser(event.mobile, event.password);
 

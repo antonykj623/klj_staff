@@ -14,6 +14,14 @@ LoginSuccess(this.loginResponseEntity);
 
 }
 
+final class LoginLoading extends LoginState {
+
+  String message;
+
+  LoginLoading(this.message);
+
+}
+
 
 final class LoginFailed extends LoginState {
 

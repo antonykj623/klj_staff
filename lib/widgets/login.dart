@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kljcafe_employee/domain/login_response_entity.dart';
+import 'package:kljcafe_employee/utils/apputils.dart';
 import 'package:kljcafe_employee/web/api_credentials.dart';
+import 'package:kljcafe_employee/widgets/home.dart';
 import '../blocs/login/login_bloc.dart';
 import '../prefdata/sharedpref.dart';
 
@@ -83,6 +85,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: BlocConsumer<LoginBloc, LoginState>(
                     listener: (context, state) {
                       if (state is LoginSuccess) {
+
+                        AppUtils.hideLoader(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("Login Success")),
                         );
@@ -93,14 +97,26 @@ class _LoginScreenState extends State<LoginScreen> {
                           {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => LoginScreen()),
+                              MaterialPageRoute(builder: (context) => HomeScreen()),
                             );
 
                           }
 
 
 
-                      } else if (state is LoginFailed) {
+                      }
+                      else if(state is LoginLoading)
+                        {
+
+                          AppUtils.showLoader(context);
+                        }
+
+
+
+
+                      else if (state is LoginFailed) {
+
+                        AppUtils.hideLoader(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(state.message)),
                         );

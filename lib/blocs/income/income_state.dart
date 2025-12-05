@@ -4,3 +4,28 @@ part of 'income_bloc.dart';
 sealed class IncomeState {}
 
 final class IncomeInitial extends IncomeState {}
+
+final class IncomeReportSuccess extends IncomeState {
+
+  IncomeDataEntity loginResponseEntity;
+
+  IncomeReportSuccess(this.loginResponseEntity);
+
+}
+
+final class IncomeReportLoading extends IncomeState {
+
+  String message;
+
+  IncomeReportLoading(this.message);
+
+}
+
+
+final class IncomeReportFailed extends IncomeState {
+
+  String message;
+
+  IncomeReportFailed(this.message);
+
+}
