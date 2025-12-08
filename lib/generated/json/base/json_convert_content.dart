@@ -8,6 +8,7 @@ import 'package:kljcafe_employee/domain/dashboard_entity.dart';
 import 'package:kljcafe_employee/domain/expense_data_entity.dart';
 import 'package:kljcafe_employee/domain/income_data_entity.dart';
 import 'package:kljcafe_employee/domain/login_response_entity.dart';
+import 'package:kljcafe_employee/domain/qr_entity.dart';
 
 JsonConvert jsonConvert = JsonConvert();
 
@@ -177,6 +178,10 @@ class JsonConvert {
       return data.map<LoginResponseData>((Map<String, dynamic> e) =>
           LoginResponseData.fromJson(e)).toList() as M;
     }
+    if (<QrEntity>[] is M) {
+      return data.map<QrEntity>((Map<String, dynamic> e) =>
+          QrEntity.fromJson(e)).toList() as M;
+    }
 
     debugPrint("$M not found");
 
@@ -207,6 +212,7 @@ class JsonConvertClassCollection {
     (IncomeDataData).toString(): IncomeDataData.fromJson,
     (LoginResponseEntity).toString(): LoginResponseEntity.fromJson,
     (LoginResponseData).toString(): LoginResponseData.fromJson,
+    (QrEntity).toString(): QrEntity.fromJson,
   };
 
   bool containsKey(String type) {

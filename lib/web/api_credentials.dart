@@ -9,6 +9,8 @@ class APICredentials{
   static String incomereport="getIncomeReport.php";
   static String expensereport="getExpenseReport.php";
   static String getAllTransactions="getAllTransactions.php";
+  static String generateQRToken="generateQRToken.php";
+  static String addExpense="addExpense.php";
 
 
 

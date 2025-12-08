@@ -29,3 +29,6 @@ final class IncomeReportFailed extends IncomeState {
   IncomeReportFailed(this.message);
 
 }
+
+
+

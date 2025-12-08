@@ -12,3 +12,5 @@ class FetchAllIncome extends IncomeEvent{
   FetchAllIncome(this.startdate, this.enddate);
 
 }
+
+

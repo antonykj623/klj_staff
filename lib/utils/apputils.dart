@@ -19,4 +19,28 @@ static void showLoader(BuildContext context) {
     }
   }
 
+
+  static void showAlert(BuildContext context,String message,)
+  {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("KLJ Cafe"),
+          content: Text(message),
+          actions: [
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+
+  }
+
 }

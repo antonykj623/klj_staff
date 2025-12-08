@@ -12,3 +12,23 @@ class FetchAllExpense extends ExpenseEvent{
   FetchAllExpense(this.startdate, this.enddate);
 
 }
+
+class FetchQR extends ExpenseEvent{
+
+
+
+  FetchQR();
+
+}
+
+
+
+class AddExpense extends ExpenseEvent{
+
+  final String amount;
+  final String entered_date;
+  String description;
+
+  AddExpense(this.amount, this.entered_date,this.description);
+
+}

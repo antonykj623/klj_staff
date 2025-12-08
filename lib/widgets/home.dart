@@ -7,6 +7,7 @@ import 'package:kljcafe_employee/blocs/income/income_bloc.dart';
 import 'package:kljcafe_employee/domain/dashboard_entity.dart';
 import 'package:kljcafe_employee/domain/expense_data_entity.dart';
 import 'package:kljcafe_employee/domain/income_data_entity.dart';
+import 'package:kljcafe_employee/widgets/addExpense.dart';
 
 import '../utils/apputils.dart';
 
@@ -145,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
             listener: (context, state) {
 
               if (state is DashboardSuccess) {
-
+                AppUtils.hideLoader(context);
                 if(state.dashboardEntity.status==1)
                   {
                     DashboardEntity dbe=state.dashboardEntity;
@@ -163,22 +164,40 @@ class _HomeScreenState extends State<HomeScreen> {
               }
               else if(state is DashboardFailed)
               {
-
+                AppUtils.hideLoader(context);
               }
               else if(state is DashboardLoading)
               {
 
+                AppUtils.showLoader(context);
               }
             },
     builder: (context, state) {
     return  Row(
       children: [
-        Expanded(child:     dashboardCard(
+        Expanded(child: GestureDetector(
+
+        child:       dashboardCard(
           title: "Income",
           amount: income,
           color: Colors.green,
           icon: Icons.arrow_upward,
-        )
+        ),
+
+          onTap: (){
+
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => AddExpenseScreen()),
+            // );
+
+
+          },
+    )
+
+
+
+
 
 
 
@@ -188,11 +207,25 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(width: 5),
 
 
-        Expanded(child:  dashboardCard(
+        Expanded(child: GestureDetector(
+
+      child:
+        dashboardCard(
           title: "Expense",
           amount: expense,
           color: Colors.red,
           icon: Icons.arrow_downward,
+        ),
+        onTap: (){
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddExpenseScreen()),
+          );
+
+        },
+
+
         )
 
 
