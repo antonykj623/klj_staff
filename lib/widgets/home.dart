@@ -8,6 +8,7 @@ import 'package:kljcafe_employee/domain/dashboard_entity.dart';
 import 'package:kljcafe_employee/domain/expense_data_entity.dart';
 import 'package:kljcafe_employee/domain/income_data_entity.dart';
 import 'package:kljcafe_employee/widgets/addExpense.dart';
+import 'package:kljcafe_employee/widgets/addIncome.dart';
 
 import '../utils/apputils.dart';
 
@@ -186,10 +187,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
           onTap: (){
 
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => AddExpenseScreen()),
-            // );
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddIncomeScreen()),
+            );
 
 
           },
