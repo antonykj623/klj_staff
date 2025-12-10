@@ -123,38 +123,38 @@ AppUtils.showLoader(context);
                 SizedBox(height: 20),
 
                 // ---------- RADIO BUTTONS ----------
-                Text("Payment Method", style: TextStyle(fontWeight: FontWeight.bold)),
-                Row(
-                  children: [
-                    Radio(
-                      value: "amount",
-                      groupValue: paymentMethod,
-                      onChanged: (val) {
-                        setState(() {
-                          paymentMethod = val.toString();
-                          showQr = false;
-                        });
-                      },
-                    ),
-                    Text("Amount"),
-
-                    Radio(
-                      value: "wallet",
-                      groupValue: paymentMethod,
-                      onChanged: (val) {
-                        setState(() {
-                          paymentMethod = val.toString();
-                          showQr = true; // show QR
-                        });
-
-                        BlocProvider.of<ExpenseBloc>(context).add(
-                            FetchQR()
-                        );
-                      },
-                    ),
-                    Text("Wallet"),
-                  ],
-                ),
+                // Text("Payment Method", style: TextStyle(fontWeight: FontWeight.bold)),
+                // Row(
+                //   children: [
+                //     Radio(
+                //       value: "amount",
+                //       groupValue: paymentMethod,
+                //       onChanged: (val) {
+                //         setState(() {
+                //           paymentMethod = val.toString();
+                //           showQr = false;
+                //         });
+                //       },
+                //     ),
+                //     Text("Amount"),
+                //
+                //     Radio(
+                //       value: "wallet",
+                //       groupValue: paymentMethod,
+                //       onChanged: (val) {
+                //         setState(() {
+                //           paymentMethod = val.toString();
+                //           showQr = true; // show QR
+                //         });
+                //
+                //         BlocProvider.of<ExpenseBloc>(context).add(
+                //             FetchQR()
+                //         );
+                //       },
+                //     ),
+                //     Text("Wallet"),
+                //   ],
+                // ),
 
                 // ---------- SHOW QR IF SELECTED ----------
                 if (showQr)

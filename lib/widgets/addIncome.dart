@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kljcafe_employee/utils/apputils.dart';
 
 class AddIncomeScreen extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   final TextEditingController dateCtrl = TextEditingController();
   final TextEditingController amountCtrl = TextEditingController();
   final TextEditingController customerCtrl = TextEditingController();
+  final TextEditingController descriptionCtrl = TextEditingController();
 
   DateTime? selectedDate;
 
@@ -46,7 +48,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     return Scaffold(
       backgroundColor: Color(0xfff5f5f5),
       appBar: AppBar(
-        title: Text("Add Income"),
+        title: Text("Add Income",style: TextStyle(color: Colors.white),),
         centerTitle: true,
         elevation: 2,
         backgroundColor: Colors.blueAccent,
@@ -75,6 +77,17 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
             ),
             SizedBox(height: 18),
 
+            buildStyledField(
+              label: "Description",
+              maxlines: 4,
+              controller: descriptionCtrl,
+              icon: Icons.list_alt,
+              keyboard: TextInputType.text,
+
+            ),
+            SizedBox(height: 18),
+
+
             // ---- SELECT CUSTOMER BUTTON ----
             GestureDetector(
               onTap: () => showCustomerSelectionDialog(context),
@@ -97,7 +110,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                   children: [
                     Text(
                       customerCtrl.text.isEmpty
-                          ? "Select Customer"
+                          ? "Select Customer (if exists)"
                           : customerCtrl.text,
                       style: TextStyle(
                         fontSize: 16,
@@ -127,6 +140,32 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 ),
                 onPressed: () {
                   // TODO: Add income logic here
+
+                  if(dateCtrl.text.trim().isNotEmpty)
+                    {
+                      if(amountCtrl.text.trim().isNotEmpty)
+                      {
+
+                        if(descriptionCtrl.text.trim().isNotEmpty)
+                        {
+
+                        }
+                        else{
+
+                          AppUtils.showAlert(context, "Enter the description");
+                        }
+                      }
+                      else{
+
+                        AppUtils.showAlert(context, "Enter the amount");
+                      }
+                    }
+                  else{
+
+                    AppUtils.showAlert(context, "Select Date");
+                  }
+
+
                 },
                 child: Text(
                   "Add Income",
@@ -148,6 +187,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     required TextEditingController controller,
     required IconData icon,
     bool readOnly = false,
+    int maxlines=1,
     TextInputType keyboard = TextInputType.text,
     VoidCallback? onTap,
   }) {
@@ -166,6 +206,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
       child: TextField(
         controller: controller,
         readOnly: readOnly,
+        maxLines: 1,
         keyboardType: keyboard,
         onTap: onTap,
         decoration: InputDecoration(
@@ -209,6 +250,8 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                     // TODO: Search by mobile
+
+
                   },
                   label: Text("Search by Mobile"),
                 ),
@@ -239,4 +282,85 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
       padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
     );
   }
+
+  void openCustomerSearchDialog() {
+    TextEditingController mobileController = TextEditingController();
+    Map<String, dynamic>? foundCustomer;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateSB) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              title: Text("Search Customer"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: mobileController,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                      labelText: "Mobile Number",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  SizedBox(height: 15),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      String query = mobileController.text.trim();
+
+                      // Search from list
+                      // foundCustomer = customers.firstWhere(
+                      //       (c) => c["mobile"] == query,
+                      //   orElse: () => {},
+                      // );
+
+                      setStateSB(() {}); // Update dialog UI
+                    },
+                    child: Text("Search"),
+                  ),
+
+                  SizedBox(height: 10),
+
+                  // Display Result
+                  foundCustomer == null
+                      ? SizedBox()
+                      : foundCustomer!.isEmpty
+                      ? Text(
+                    "No customer found",
+                    style: TextStyle(color: Colors.red),
+                  )
+                      : Column(
+                    children: [
+                      Text(
+                        "Customer Found:",
+                        style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Text("Name: ${foundCustomer!['name']}"),
+                      Text("Mobile: ${foundCustomer!['mobile']}"),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Close"),
+                )
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
 }

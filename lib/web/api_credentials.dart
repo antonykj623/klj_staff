@@ -11,6 +11,7 @@ class APICredentials{
   static String getAllTransactions="getAllTransactions.php";
   static String generateQRToken="generateQRToken.php";
   static String addExpense="addExpense.php";
+  static String addIncome="addIncome.php";
 
 
 

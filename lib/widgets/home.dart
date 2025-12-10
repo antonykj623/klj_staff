@@ -17,14 +17,15 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   double income = 0.0;
   double expense = 0.0;
   double wallet = 0.0;
-
+  List<DashboardIncomedata>? incomedata = [];
+  List<DashboardExpensedata>? expensedata = [];
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
-
+  late TabController _tabController;
   String formatDate(DateTime date) {
     return DateFormat("yyyy-MM-dd").format(date);
   }
@@ -34,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
 
     BlocProvider.of<DashboardBloc>(context).add(
       LoadDashboard(
@@ -78,175 +80,227 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          children: [
+      body:  Column(
+    children: [
+    Expanded(
+    child: ListView(
+        padding: EdgeInsets.all(8),
+    children: [
 
-            // -------------------------
-            // START & END DATE PICKERS
-            // -------------------------
-            Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => pickStartDate(),
-                    child: dateCard("Start Date", formatDate(startDate)),
-                  ),
-                ),
-                const SizedBox(width: 5),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => pickEndDate(),
-                    child: dateCard("End Date", formatDate(endDate)),
-                  ),
-                ),
-              ],
-            ),
+    // ------------- DATE PICKERS -------------
+    Row(
+    children: [
+    Expanded(
+    child: GestureDetector(
+    onTap: () => pickStartDate(),
+    child: dateCard("Start Date", formatDate(startDate)),
+    ),
+    ),
+    const SizedBox(width: 5),
+    Expanded(
+    child: GestureDetector(
+    onTap: () => pickEndDate(),
+    child: dateCard("End Date", formatDate(endDate)),
+    ),
+    ),
+    ],
+    ),
 
-            const SizedBox(height: 20),
+    const SizedBox(height: 20),
 
-
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2575FC),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {
-
-                  BlocProvider.of<DashboardBloc>(context).add(
-                    LoadDashboard(
-                        formatDate(startDate),
-                        formatDate(endDate)
-                    ),
-                  );
-
-                },
-                child:  const Text(
-                  "Search",
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // -------------------------
-            // DASHBOARD CARDS
-            // -------------------------
-
-            BlocConsumer<DashboardBloc, DashboardState>(
-            listener: (context, state) {
-
-              if (state is DashboardSuccess) {
-                AppUtils.hideLoader(context);
-                if(state.dashboardEntity.status==1)
-                  {
-                    DashboardEntity dbe=state.dashboardEntity;
-
-                    setState(() {
-                      income=dbe.totalIncome!.toDouble();
-                      expense=dbe.totalExpense!.toDouble();
-
-
-                    });
-
-
-                  }
-
-              }
-              else if(state is DashboardFailed)
-              {
-                AppUtils.hideLoader(context);
-              }
-              else if(state is DashboardLoading)
-              {
-
-                AppUtils.showLoader(context);
-              }
-            },
-    builder: (context, state) {
-    return  Row(
-      children: [
-        Expanded(child: GestureDetector(
-
-        child:       dashboardCard(
-          title: "Income",
-          amount: income,
-          color: Colors.green,
-          icon: Icons.arrow_upward,
-        ),
-
-          onTap: (){
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AddIncomeScreen()),
-            );
-
-
-          },
-    )
-
-
-
-
-
-
-
-
-
-        ),
-        const SizedBox(width: 5),
-
-
-        Expanded(child: GestureDetector(
-
-      child:
-        dashboardCard(
-          title: "Expense",
-          amount: expense,
-          color: Colors.red,
-          icon: Icons.arrow_downward,
-        ),
-        onTap: (){
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddExpenseScreen()),
-          );
-
-        },
-
-
-        )
-
-
-        ),
-      ],
+    // SEARCH BUTTON
+    SizedBox(
+    width: double.infinity,
+    height: 50,
+    child: ElevatedButton(
+    style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFF2575FC),
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+    ),
+    ),
+    onPressed: () {
+    BlocProvider.of<DashboardBloc>(context).add(
+    LoadDashboard(formatDate(startDate), formatDate(endDate)),
     );
     },
+    child: const Text(
+    "Search",
+    style: TextStyle(fontSize: 18, color: Colors.white),
+    ),
+    ),
+    ),
+
+    const SizedBox(height: 20),
+
+    // ----------- DASHBOARD CARDS (INCOME / EXPENSE) -----------
+    BlocConsumer<DashboardBloc, DashboardState>(
+    listener: (context, state) {
+    if (state is DashboardSuccess) {
+    AppUtils.hideLoader(context);
+
+    DashboardEntity dbe = state.dashboardEntity;
+    setState(() {
+    income = dbe.totalIncome!.toDouble();
+    expense = dbe.totalExpense!.toDouble();
+    incomedata = dbe.incomedata!;
+    expensedata = dbe.expensedata!;
+    });
+    }
+    else if (state is DashboardFailed) {
+    AppUtils.hideLoader(context);
+    }
+    else if (state is DashboardLoading) {
+    AppUtils.showLoader(context);
+    }
+    },
+
+    builder: (context, state) {
+    return Column(
+    children: [
+    Row(
+    children: [
+    Expanded(
+    child: GestureDetector(
+    onTap: () {
+    Navigator.push(context,
+    MaterialPageRoute(builder: (_) => AddIncomeScreen())
+    );
+    },
+    child: dashboardCard(
+    title: "Income",
+    amount: income,
+    color: Colors.green,
+    icon: Icons.arrow_upward,
+    ),
+    ),
+    ),
+    const SizedBox(width: 5),
+    Expanded(
+    child: GestureDetector(
+    onTap: () {
+    Navigator.push(context,
+    MaterialPageRoute(builder: (_) => AddExpenseScreen())
+    );
+    },
+    child: dashboardCard(
+    title: "Expense",
+    amount: expense,
+    color: Colors.red,
+    icon: Icons.arrow_downward,
+    ),
+    ),
+    ),
+    ],
+    ),
+
+    const SizedBox(height: 15),
+
+    // -------- TABS ---------
+    Container(
+    height: 50,
+    decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(12),
+    ),
+    child:  TabBar(
+      controller: _tabController,
+    indicatorColor: Colors.blueAccent,
+    labelColor: Colors.blueAccent,
+    unselectedLabelColor: Colors.black54,
+    tabs: [
+    Tab(text: "Income"),
+    Tab(text: "Expense"),
+    ],
+    ),
+    ),
+
+    SizedBox(
+    height: MediaQuery.of(context).size.height * 0.55,
+    child: TabBarView(
+      controller: _tabController,
+    children: [
+    // ------- INCOME LIST --------
+    ListView.builder(
+    padding: EdgeInsets.all(10),
+    itemCount: incomedata!.length,
+    itemBuilder: (context, index) {
+    final item = incomedata![index];
+
+    String? createddate=item.createdDate;
+    DateTime parsedDate = DateTime.parse(createddate!);
+
+    String idate=parsedDate.day.toString()+"/"+parsedDate.month.toString()+"/"+parsedDate.year.toString();
+    return Card(
+    elevation: 2,
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+    ),
+    child: ListTile(
+    leading: CircleAvatar(
+    backgroundColor: Colors.green.shade100,
+    child: Icon(Icons.arrow_downward, color: Colors.green),
+    ),
+    title: Text(item.purpose ?? "No title"),
+    subtitle: Text("Date: ${idate ?? ""}"),
+    trailing: Text(
+    "₹ ${item.amount ?? 0}",
+    style: const TextStyle(
+    color: Colors.green,
+    fontWeight: FontWeight.bold),
+    ),
+    ),
+    );
+    },
+    ),
+
+    // ------- EXPENSE LIST --------
+    ListView.builder(
+    padding: EdgeInsets.all(10),
+    itemCount: expensedata!.length,
+    itemBuilder: (context, index) {
+    final item = expensedata![index];
+
+    String? createddate=item.createdDate;
+    DateTime parsedDate = DateTime.parse(createddate!);
+
+    String idate=parsedDate.day.toString()+"/"+parsedDate.month.toString()+"/"+parsedDate.year.toString();
+    return Card(
+    elevation: 2,
+    shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+    ),
+    child: ListTile(
+    leading: CircleAvatar(
+    backgroundColor: Colors.red.shade100,
+    child: Icon(Icons.arrow_upward, color: Colors.red),
+    ),
+    title: Text(item.description ?? "No title"),
+    subtitle: Text("Date: ${idate ?? ""}"),
+    trailing: Text(
+    "₹ ${item.amount ?? 0}",
+    style: const TextStyle(
+    color: Colors.red,
+    fontWeight: FontWeight.bold),
+    ),
+    ),
+    );
+    },
+    ),
+    ],
+    ),
+    ),
+    ],
+    );
+    },
+    ),
+    ],
+    ),
+    ),
+    ],
     )
 
 
-,
-
-            const SizedBox(height: 5),
-
-
-
-            const SizedBox(height: 20),
-          ],
-        ),
-      ),
     );
   }
 
