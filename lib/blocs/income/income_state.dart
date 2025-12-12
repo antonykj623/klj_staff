@@ -32,3 +32,55 @@ final class IncomeReportFailed extends IncomeState {
 
 
 
+final class CustomerByIDSuccess extends IncomeState {
+
+  CustomerDataEntity customerDataEntity;
+
+  CustomerByIDSuccess(this.customerDataEntity);
+
+}
+
+final class CustomerByIDLoading extends IncomeState {
+
+  String message;
+
+  CustomerByIDLoading(this.message);
+
+}
+
+
+final class CustomerByIDFailed extends IncomeState {
+
+  String message;
+
+  CustomerByIDFailed(this.message);
+
+}
+
+
+
+
+final class CustomerByIDBYQRSuccess extends IncomeState {
+
+  CustomerDataEntity customerDataEntity;
+
+  CustomerByIDBYQRSuccess(this.customerDataEntity);
+
+}
+
+final class CustomerByQRLoading extends IncomeState {
+
+  String message;
+
+  CustomerByQRLoading(this.message);
+
+}
+
+
+final class CustomerByQRFailed extends IncomeState {
+
+  String message;
+
+  CustomerByQRFailed(this.message);
+
+}

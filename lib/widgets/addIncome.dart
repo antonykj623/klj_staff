@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kljcafe_employee/blocs/income/income_bloc.dart';
 import 'package:kljcafe_employee/utils/apputils.dart';
-
+import 'package:bloc/bloc.dart';
+import 'package:kljcafe_employee/widgets/qrcodescanner.dart';
+import '../blocs/expense/expense_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 class AddIncomeScreen extends StatefulWidget {
   @override
   _AddIncomeScreenState createState() => _AddIncomeScreenState();
@@ -14,6 +18,7 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
   final TextEditingController descriptionCtrl = TextEditingController();
 
   DateTime? selectedDate;
+  String id="0";
 
   Future<void> pickDate() async {
     final picked = await showDatePicker(
@@ -43,6 +48,66 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     }
   }
 
+  Widget _buildRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(fontWeight: FontWeight.w600)),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(color: Colors.black87),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void showCustomerDetailsDialog(BuildContext context, Map<String, dynamic> response) {
+    final data = response["data"];
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Text("Customer Details", style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildRow("ID", "kljcafe_"+data["id"]),
+              _buildRow("Name", data["name"]),
+              _buildRow("Mobile", data["mobile"]),
+              // _buildRow("User Type", data["usertype"]),
+              // _buildRow("Status", data["status"]),
+             // _buildRow("Created Date", data["created_date"]),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () { Navigator.pop(context);
+
+                setState(() {
+                  customerCtrl.text=data["name"];
+                  id=data["id"];
+                });
+
+                },
+              child: Text("OK"),
+            )
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +118,69 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
         elevation: 2,
         backgroundColor: Colors.blueAccent,
       ),
-      body: SingleChildScrollView(
+      body: BlocConsumer<IncomeBloc, IncomeState>(
+        listener: (context, state) {
+          if (state is CustomerByIDSuccess) {
+            AppUtils.hideLoader(context);
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Customer fetching Success")),
+            );
+
+            showCustomerDetailsDialog(context, state.customerDataEntity.toJson());
+
+
+
+          } else if (state is CustomerByIDFailed) {
+
+            AppUtils.hideLoader(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Customer Fetching failed")),
+            );
+
+          } else if (state is CustomerByIDLoading) {
+
+            AppUtils.showLoader(context);
+
+          }
+
+
+
+
+          else if (state is CustomerByIDBYQRSuccess) {
+            AppUtils.hideLoader(context);
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Customer fetching Success")),
+            );
+
+            showCustomerDetailsDialog(context, state.customerDataEntity.toJson());
+
+
+
+          } else if (state is CustomerByQRFailed) {
+
+            AppUtils.hideLoader(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Customer Fetching failed")),
+            );
+
+          } else if (state is CustomerByQRLoading) {
+
+            AppUtils.showLoader(context);
+
+
+
+          }
+
+
+
+
+
+
+        }, builder: (BuildContext context, IncomeState state) {
+
+       return SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
@@ -175,7 +302,18 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
             ),
           ],
         ),
-      ),
+      );
+
+
+
+      },
+
+
+      )
+
+
+
+
     );
   }
 
@@ -247,9 +385,14 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 ElevatedButton.icon(
                   icon: Icon(Icons.phone_android),
                   style: dialogBtnStyle(),
-                  onPressed: () {
-                    Navigator.pop(context);
+                  onPressed: () async {
+
                     // TODO: Search by mobile
+                    Navigator.pop(context);
+
+                   showMobileSearchDialog(context);
+
+
 
 
                   },
@@ -260,9 +403,31 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                 ElevatedButton.icon(
                   icon: Icon(Icons.qr_code_scanner),
                   style: dialogBtnStyle(),
-                  onPressed: () {
-                    Navigator.pop(context);
+                  onPressed: () async {
+
                     // TODO: Search by QR
+
+
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MobileScannerPage(),
+                        ),
+                      );
+
+                      if (result != null) {
+                        print("QR RESULT: $result");
+
+
+
+                          BlocProvider.of<IncomeBloc>(context).add(
+                              FetchCustomerByQR(result)
+                          );
+                        Navigator.pop(context);
+
+                      }
+
+
                   },
                   label: Text("Search by QR"),
                 ),
@@ -273,6 +438,67 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
       },
     );
   }
+
+
+   showMobileSearchDialog(BuildContext context) {
+    TextEditingController mobileCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: Text("Search Customer"),
+
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              // Mobile Input Field
+              TextField(
+                controller: mobileCtrl,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  labelText: "Enter Mobile Number",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              // Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      String mobile = mobileCtrl.text.trim();
+
+                      if(mobile.isNotEmpty) {
+                        BlocProvider.of<IncomeBloc>(context).add(
+                            FetchCustomerByID(mobile)
+                        );
+                      }
+                      // return value
+                    },
+                    child: Text("Search"),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("Cancel"),
+                  )
+                ],
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
   ButtonStyle dialogBtnStyle() {
     return ElevatedButton.styleFrom(

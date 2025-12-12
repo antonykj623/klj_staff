@@ -14,3 +14,18 @@ class FetchAllIncome extends IncomeEvent{
 }
 
 
+class FetchCustomerByID extends IncomeEvent{
+
+  final String mobile;
+
+  FetchCustomerByID(this.mobile);
+
+}
+
+class FetchCustomerByQR extends IncomeEvent{
+
+  final String qrstring;
+
+  FetchCustomerByQR(this.qrstring);
+
+}

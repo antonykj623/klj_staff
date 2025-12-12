@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:bloc/bloc.dart';
+import 'package:kljcafe_employee/domain/customer_data_entity.dart';
 import 'package:kljcafe_employee/domain/income_data_entity.dart';
 import 'package:kljcafe_employee/web/api_credentials.dart';
 import 'package:meta/meta.dart';
@@ -38,6 +39,62 @@ class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
         }
       } catch (e) {
         emit(IncomeReportFailed(e.toString()));
+      }
+
+    });
+
+    on<FetchCustomerByID>((event, emit) async {
+      // TODO: implement event handler
+
+      try {
+        emit(CustomerByIDLoading(""));
+
+
+
+
+
+        final response =
+        await WebCallRepository.get(APICredentials.getCustomerDetailsByMobile+"?mobile="+event.mobile);
+
+
+        if (response["status"] == 1) {
+          CustomerDataEntity loginResponseEntity=CustomerDataEntity.fromJson(response);
+
+
+          emit(CustomerByIDSuccess(loginResponseEntity));
+        } else {
+          emit(CustomerByIDFailed(response["message"] ?? " failed"));
+        }
+      } catch (e) {
+        emit(CustomerByIDFailed(e.toString()));
+      }
+
+    });
+
+    on<FetchCustomerByQR>((event, emit) async {
+      // TODO: implement event handler
+
+      try {
+        emit(CustomerByQRLoading(""));
+
+
+
+
+
+        final response =
+        await WebCallRepository.get(APICredentials.decryptQRToken+"?qrtoken="+event.qrstring);
+
+
+        if (response["status"] == 1) {
+          CustomerDataEntity loginResponseEntity=CustomerDataEntity.fromJson(response);
+
+
+          emit(CustomerByIDBYQRSuccess(loginResponseEntity));
+        } else {
+          emit(CustomerByQRFailed(response["message"] ?? " failed"));
+        }
+      } catch (e) {
+        emit(CustomerByQRFailed(e.toString()));
       }
 
     });

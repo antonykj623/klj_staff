@@ -48,9 +48,11 @@ class _MobileScannerPageState extends State<MobileScannerPage> {
                   setState(() {
                     scannedValue = code;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Scanned: $code')),
-                  );
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(content: Text('Scanned: $code')),
+                  // );
+
+                  Navigator.pop(context, code);
                 }
               }
             },
