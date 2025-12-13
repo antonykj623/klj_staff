@@ -216,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     ),
 
     SizedBox(
-    height: MediaQuery.of(context).size.height * 0.55,
+    height: MediaQuery.of(context).size.height * 0.39,
     child: TabBarView(
       controller: _tabController,
     children: [
@@ -227,10 +227,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     itemBuilder: (context, index) {
     final item = incomedata![index];
 
-    String? createddate=item.createdDate;
-    DateTime parsedDate = DateTime.parse(createddate!);
+    String? idate=item.createdDate;
+    //DateTime parsedDate = DateTime.parse(createddate!);
 
-    String idate=parsedDate.day.toString()+"/"+parsedDate.month.toString()+"/"+parsedDate.year.toString();
+   // String idate=parsedDate.day.toString()+"/"+parsedDate.month.toString()+"/"+parsedDate.year.toString();
     return Card(
     elevation: 2,
     shape: RoundedRectangleBorder(
@@ -241,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     backgroundColor: Colors.green.shade100,
     child: Icon(Icons.arrow_downward, color: Colors.green),
     ),
-    title: Text(item.purpose ?? "No title"),
+    title: Text(item.description ?? "No title"),
     subtitle: Text("Date: ${idate ?? ""}"),
     trailing: Text(
     "₹ ${item.amount ?? 0}",
@@ -261,10 +261,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     itemBuilder: (context, index) {
     final item = expensedata![index];
 
-    String? createddate=item.createdDate;
-    DateTime parsedDate = DateTime.parse(createddate!);
-
-    String idate=parsedDate.day.toString()+"/"+parsedDate.month.toString()+"/"+parsedDate.year.toString();
+    String idate=item.createdDate.toString();
+    // DateTime parsedDate = DateTime.parse(createddate!);
+    //
+    // String idate=parsedDate.day.toString()+"/"+parsedDate.month.toString()+"/"+parsedDate.year.toString();
     return Card(
     elevation: 2,
     shape: RoundedRectangleBorder(

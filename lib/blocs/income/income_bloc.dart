@@ -98,5 +98,44 @@ class IncomeBloc extends Bloc<IncomeEvent, IncomeState> {
       }
 
     });
+
+    on<AddIncomeUser>((event, emit) async {
+      // TODO: implement event handler
+
+      try {
+        emit(AddIncomeLoading(""));
+        // $amount=$_POST['amount'];
+        // $wallet_amount=$_POST['wallet_amount'];
+        // $description=$_POST['description'];
+        // $entered_date=$_POST['date'];
+        // $userid_toSendwalletamount=$_POST['userid_toSendwalletamount'];
+
+        Map mp=new HashMap();
+        mp["userid_toSendwalletamount"]=event.userid;
+        mp["date"]=event.date;
+        mp["description"]=event.description;
+        mp["wallet_amount"]=event.waletamount;
+        mp["amount"]=event.amount;
+
+
+
+
+
+        final response =
+        await WebCallRepository.post(mp,APICredentials.addIncome);
+
+
+        if (response["status"] == 1) {
+
+
+          emit(AddIncomeSuccess("Success"));
+        } else {
+          emit(AddIncomeFailed(response["message"] ?? " failed"));
+        }
+      } catch (e) {
+        emit(AddIncomeFailed(e.toString()));
+      }
+
+    });
   }
 }

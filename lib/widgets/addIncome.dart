@@ -14,6 +14,7 @@ class AddIncomeScreen extends StatefulWidget {
 class _AddIncomeScreenState extends State<AddIncomeScreen> {
   final TextEditingController dateCtrl = TextEditingController();
   final TextEditingController amountCtrl = TextEditingController();
+  final TextEditingController walletamountCtrl = TextEditingController();
   final TextEditingController customerCtrl = TextEditingController();
   final TextEditingController descriptionCtrl = TextEditingController();
 
@@ -108,6 +109,18 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
     );
   }
 
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+
+      selectedDate = DateTime.now();
+      dateCtrl.text = DateFormat("dd/MM/yyyy").format(selectedDate!);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -172,8 +185,35 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
 
 
           }
+          else if(state is AddIncomeLoading)
+            {
+              AppUtils.showLoader(context);
+            }
+          else if(state is AddIncomeFailed)
+          {
+            AppUtils.hideLoader(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Income Adding failed")),
+            );
+          }
+          else if(state is AddIncomeSuccess)
+          {
+            AppUtils.hideLoader(context);
+            setState(() {
+              selectedDate = DateTime.now();
+              dateCtrl.text = DateFormat("dd/MM/yyyy").format(selectedDate!);
+              amountCtrl.clear();
+              descriptionCtrl.clear();
+              walletamountCtrl.clear();
+              id="0";
+              customerCtrl.clear();
 
+            });
 
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Income Added suceessfully")),
+            );
+          }
 
 
 
@@ -203,7 +243,13 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
               keyboard: TextInputType.number,
             ),
             SizedBox(height: 18),
-
+            buildStyledField(
+              label: "Customer's sent Wallet Amount",
+              controller: walletamountCtrl,
+              icon: Icons.currency_rupee,
+              keyboard: TextInputType.number,
+            ),
+            SizedBox(height: 18),
             buildStyledField(
               label: "Description",
               maxlines: 4,
@@ -273,13 +319,27 @@ class _AddIncomeScreenState extends State<AddIncomeScreen> {
                       if(amountCtrl.text.trim().isNotEmpty)
                       {
 
-                        if(descriptionCtrl.text.trim().isNotEmpty)
-                        {
+                        if(walletamountCtrl.text.trim().isNotEmpty) {
+                          if (descriptionCtrl.text
+                              .trim()
+                              .isNotEmpty) {
 
+
+                            BlocProvider.of<IncomeBloc>(context).add(
+                                AddIncomeUser(amountCtrl.text.trim(), descriptionCtrl.text, dateCtrl.text.trim(),id,walletamountCtrl.text.trim())
+                            );
+
+
+                          }
+                          else {
+                            AppUtils.showAlert(
+                                context, "Enter the description");
+                          }
                         }
                         else{
+                          AppUtils.showAlert(
+                              context, "Enter the wallet amount");
 
-                          AppUtils.showAlert(context, "Enter the description");
                         }
                       }
                       else{

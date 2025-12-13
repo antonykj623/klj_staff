@@ -29,3 +29,15 @@ class FetchCustomerByQR extends IncomeEvent{
   FetchCustomerByQR(this.qrstring);
 
 }
+
+class AddIncomeUser extends IncomeEvent{
+
+  final String amount;
+  final String waletamount;
+  final String description;
+  final String date;
+  final String userid;
+
+  AddIncomeUser(this.amount,this.description,this.date,this.userid,this.waletamount);
+
+}

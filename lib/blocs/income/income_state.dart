@@ -84,3 +84,31 @@ final class CustomerByQRFailed extends IncomeState {
   CustomerByQRFailed(this.message);
 
 }
+
+
+
+
+final class AddIncomeSuccess extends IncomeState {
+
+  String message;
+
+  AddIncomeSuccess(this.message);
+
+}
+
+final class AddIncomeLoading extends IncomeState {
+
+  String message;
+
+  AddIncomeLoading(this.message);
+
+}
+
+
+final class AddIncomeFailed extends IncomeState {
+
+  String message;
+
+  AddIncomeFailed(this.message);
+
+}
