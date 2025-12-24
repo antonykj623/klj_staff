@@ -34,8 +34,8 @@ android {
         applicationId = "in.kljcafe.staff.kljcafe_employee"
         minSdk = flutter.minSdkVersion  // Ensure minimum SDK is at least 21
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.0.3"
+        versionCode = 7
+        versionName = "1.0.5"
         multiDexEnabled = true  // Enable multidex
     }
 

@@ -428,230 +428,214 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
       ),
 
-      body:  Column(
-    children: [
-    Expanded(
-    child: ListView(
-        padding: EdgeInsets.all(8),
-    children: [
+      body:  DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          body: SafeArea(
+            child: CustomScrollView(
+              slivers: [
 
-    // ------------- DATE PICKERS -------------
-    Row(
-    children: [
-    Expanded(
-    child: GestureDetector(
-    onTap: () => pickStartDate(),
-    child: dateCard("Start Date", formatDate(startDate)),
-    ),
-    ),
-    const SizedBox(width: 5),
-    Expanded(
-    child: GestureDetector(
-    onTap: () => pickEndDate(),
-    child: dateCard("End Date", formatDate(endDate)),
-    ),
-    ),
-    ],
-    ),
-
-    const SizedBox(height: 20),
-
-    // SEARCH BUTTON
-    SizedBox(
-    width: double.infinity,
-    height: 50,
-    child: ElevatedButton(
-    style: ElevatedButton.styleFrom(
-    backgroundColor: const Color(0xFF2575FC),
-    shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(12),
-    ),
-    ),
-    onPressed: () {
-  getDashboardData();
-    },
-    child: const Text(
-    "Search",
-    style: TextStyle(fontSize: 18, color: Colors.white),
-    ),
-    ),
-    ),
-
-    const SizedBox(height: 20),
-
-    // ----------- DASHBOARD CARDS (INCOME / EXPENSE) -----------
-
-      Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => AddIncomeScreen())
-                    );
-                  },
-                  child: dashboardCard(
-                    title: "Income",
-                    amount: income,
-                    color: Colors.green,
-                    icon: Icons.arrow_upward,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => AddExpenseScreen())
-                    );
-                  },
-                  child: dashboardCard(
-                    title: "Expense",
-                    amount: expense,
-                    color: Colors.red,
-                    icon: Icons.arrow_downward,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 15),
-
-          // -------- TABS ---------
-          Container(
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child:  TabBar(
-              controller: _tabController,
-              indicatorColor: Colors.blueAccent,
-              labelColor: Colors.blueAccent,
-              unselectedLabelColor: Colors.black54,
-              tabs: [
-                Tab(text: "Income"),
-                Tab(text: "Expense"),
-              ],
-            ),
-          ),
-
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.398,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                // ------- INCOME LIST --------
-                (incomedata!.length>0)?ListView.builder(
-                  padding: EdgeInsets.all(10),
-                  itemCount: incomedata!.length,
-                  itemBuilder: (context, index) {
-                    final item = incomedata![index];
-
-                    String? idate=item.createdDate;
-                    //DateTime parsedDate = DateTime.parse(createddate!);
-
-                    // String idate=parsedDate.day.toString()+"/"+parsedDate.month.toString()+"/"+parsedDate.year.toString();
-                    return Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.green.shade100,
-                          child: Icon(Icons.arrow_downward, color: Colors.green),
+                /// -------- DATE PICKERS ----------
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: pickStartDate,
+                            child: dateCard(
+                              "Start Date",
+                              formatDate(startDate),
+                            ),
+                          ),
                         ),
-                        title: Text(item.description ?? "No title"),
-                        subtitle: Text("Date: ${idate ?? ""}"),
-                        trailing: Text(
-                          "₹ ${item.amount ?? 0}",
-                          style: const TextStyle(
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: pickEndDate,
+                            child: dateCard(
+                              "End Date",
+                              formatDate(endDate),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                /// -------- SEARCH BUTTON ----------
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                    child: SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2575FC),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: getDashboardData,
+                        child: const Text(
+                          "Search",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                /// -------- DASHBOARD CARDS ----------
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => AddIncomeScreen()),
+                              );
+                            },
+                            child: dashboardCard(
+                              title: "Income",
+                              amount: income,
                               color: Colors.green,
-                              fontWeight: FontWeight.bold),
+                              icon: Icons.arrow_downward,
+                            ),
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ) :
-                Container(
-                  width: double.infinity,
-                  height: 250,
-                  child: Center(
-
-                    child: Text("No data found"),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => AddExpenseScreen()),
+                              );
+                            },
+                            child: dashboardCard(
+                              title: "Expense",
+                              amount: expense,
+                              color: Colors.red,
+                              icon: Icons.arrow_upward,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
-                // ------- EXPENSE LIST --------
-                (expensedata!.length>0)? ListView.builder(
-                  padding: EdgeInsets.all(10),
-                  itemCount: expensedata!.length,
-                  itemBuilder: (context, index) {
-                    final item = expensedata![index];
-
-                    String idate=item.createdDate.toString();
-                    // DateTime parsedDate = DateTime.parse(createddate!);
-                    //
-                    // String idate=parsedDate.day.toString()+"/"+parsedDate.month.toString()+"/"+parsedDate.year.toString();
-                    return Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
+                /// -------- TAB BAR ----------
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                    child: Container(
+                      height: 45,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: Colors.red.shade100,
-                          child: Icon(Icons.arrow_upward, color: Colors.red),
-                        ),
-                        title: Text(item.description ?? "No title"),
-                        subtitle: Text("Date: ${idate ?? ""}"),
-                        trailing: Text(
-                          "₹ ${item.amount ?? 0}",
-                          style: const TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold),
-                        ),
+                      child: const TabBar(
+                        indicatorColor: Colors.blueAccent,
+                        labelColor: Colors.blueAccent,
+                        unselectedLabelColor: Colors.black54,
+                        tabs: [
+                          Tab(text: "Income"),
+                          Tab(text: "Expense"),
+                        ],
                       ),
-                    );
-                  },
-                ):
-                Container(
-                  width: double.infinity,
-                  height: 250,
-                  child: Center(
-
-                    child: Text("No data found"),
+                    ),
                   ),
                 ),
 
+                /// -------- TAB CONTENT ----------
+                SliverFillRemaining(
+                  child: TabBarView(
+                    children: [
 
+                      /// -------- INCOME LIST ----------
+                      incomedata != null && incomedata!.isNotEmpty
+                          ? ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: incomedata!.length,
+                        itemBuilder: (context, index) {
+                          final item = incomedata![index];
+                          return _transactionTile(
+                            title: item.description ?? "No title",
+                            date: item.createdDate ?? "",
+                            amount: item.amount.toString(),
+                            color: Colors.green,
+                            icon: Icons.arrow_downward,
+                          );
+                        },
+                      )
+                          : const Center(child: Text("No income data")),
 
-
+                      /// -------- EXPENSE LIST ----------
+                      expensedata != null && expensedata!.isNotEmpty
+                          ? ListView.builder(
+                        padding: const EdgeInsets.all(8),
+                        itemCount: expensedata!.length,
+                        itemBuilder: (context, index) {
+                          final item = expensedata![index];
+                          return _transactionTile(
+                            title: item.description ?? "No title",
+                            date: item.createdDate ?? "",
+                            amount: item!.amount.toString(),
+                            color: Colors.red,
+                            icon: Icons.arrow_upward,
+                          );
+                        },
+                      )
+                          : const Center(child: Text("No expense data")),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-        ],
+        ),
       )
 
 
 
+    );
+  }
 
-
-
-
-
-    ],
-    ),
-    ),
-    ],
-    )
-
-
+  Widget _transactionTile({
+    required String title,
+    required String date,
+    required String amount,
+    required Color color,
+    required IconData icon,
+  }) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: color.withOpacity(0.15),
+          child: Icon(icon, color: color),
+        ),
+        title: Text(title),
+        subtitle: Text("Date: $date"),
+        trailing: Text(
+          "₹ $amount",
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
     );
   }
 
